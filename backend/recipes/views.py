@@ -1,8 +1,7 @@
-from django.shortcuts import get_object_or_404
-from rest_framework import mixins, viewsets
+from rest_framework import filters, mixins, viewsets
 
-from recipes.models import Tag
-from recipes.serializers import TagSerializer
+from recipes.models import Ingredient, Tag
+from recipes.serializers import IngredientSerializer, TagSerializer
 
 
 class TagViewSet(mixins.ListModelMixin,
@@ -10,3 +9,12 @@ class TagViewSet(mixins.ListModelMixin,
                  viewsets.GenericViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+
+
+class IngredientViewSet(mixins.ListModelMixin,
+                        mixins.RetrieveModelMixin,
+                        viewsets.GenericViewSet):
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('^name',)

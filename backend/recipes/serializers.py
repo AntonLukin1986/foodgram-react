@@ -1,18 +1,22 @@
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
 
-from recipes.models import Tag
+from recipes.models import Ingredient, Tag
 
 
 class TagSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=200, allow_blank=False)
-    color = serializers.CharField(max_length=7, allow_blank=False)
-    slug = serializers.SlugField(
-        max_length=200,
-        allow_blank=False,
-        validators=[UniqueValidator(queryset=Tag.objects.all())]
-    )
+    name = serializers.CharField()
+    color = serializers.CharField()
+    slug = serializers.SlugField()
 
     class Meta:
         model = Tag
         fields = ('id', 'name', 'color', 'slug')
+
+
+class IngredientSerializer(serializers.ModelSerializer):
+    name = serializers.CharField()
+    measurement_unit = serializers.CharField()
+
+    class Meta:
+        model = Ingredient
+        fields = ('id', 'name', 'measurement_unit')
