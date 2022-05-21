@@ -1,0 +1,6 @@
+# superuser:
+admin | admin | token: fece13800e7f58f7140b8fe10ede969a27bb7632
+
+# users:
+anton | 17x03y19z86 | token: 8fa3360cd9cc8d133da323ff78b13dd412cac173
+inna | 19x02y19z94 | token: 1c8bfea3970aab34f9582135cb6608ab572acf3b
