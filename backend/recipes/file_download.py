@@ -6,28 +6,25 @@ def download_pdf(to_buy, HttpResponse, pdfmetrics,
         'attachment; filename="shopping_list.pdf"'
     )
     pdfmetrics.registerFont(
-        TTFont(
-            'Amstelvar_Roman',
-            'D:/dev/foodgram-project-react/data/Amstelvar_Roman.ttf', 'UTF-8')
-        )
+        TTFont('Amstelvar_Roman', 'Amstelvar_Roman.ttf', 'UTF-8')
+    )
     page = Canvas(response)
-    # настройки для заголовка
     page.setFont('Amstelvar_Roman', size=20)
-    page.drawString(200, 780, 'СПИСОК ИНГРЕДИЕНТОВ')  # отступы слева, снизу
-    # настройки для основного текста
+    page.drawString(170, 780, 'СПИСОК ИНГРЕДИЕНТОВ')
     page.setFont('Amstelvar_Roman', size=18)
     margin = 740
     for i, (name, data) in enumerate(to_buy.items(), 1):
-        page.drawString(72, margin, (f'{i}.  {name}  -  {data[0]} '
-                                     f'{data[1]}'))
+        page.drawString(
+            72, margin, f'{i}.  {name}  -  {data[0]} {data[1]}'
+        )
         margin -= 30
-    recipes = {'name': item.name for item in Recipe.objects.filter(
+    recipes = Recipe.objects.filter(
         user_carts__user=request.user
-    ).order_by('name')}
+    ).order_by('name').values('name')
     page.drawString(72, margin - 30, 'для приготовления:')
     margin -= 60
-    for recipe_name in recipes.values():
-        page.drawString(72, margin, recipe_name)
+    for recipe in recipes:
+        page.drawString(72, margin, '~ ' + recipe['name'])
         margin -= 30
     page.save()
     return response
@@ -35,19 +32,19 @@ def download_pdf(to_buy, HttpResponse, pdfmetrics,
 
 def download_txt(to_buy, Recipe, request, HttpResponse, status):
     """Скачивание файла в формате txt."""
-    result_list = '\tСписок продуктов:\n\n'
+    result = '\tСписок продуктов:\n'
     for i, (name, quantity_unit) in enumerate(to_buy.items(), 1):
-        result_list += (
+        result += (
             str(i) + '. ' + name + ':  ' +
             str(quantity_unit[0]) + ' ' + quantity_unit[1] + '\n'
         )
-    result_list += '\nдля приготовления:\n'
+    result += '\nдля приготовления:\n'
     for recipe in Recipe.objects.filter(
         user_carts__user=request.user
-    ).order_by('name'):
-        result_list += '~' + recipe.name + '\n'
+    ).order_by('name').values('name'):
+        result += '~ ' + recipe['name'] + '\n'
     response = HttpResponse(
-        result_list, content_type='plain/txt', status=status.HTTP_200_OK
+        result, content_type='plain/txt', status=status.HTTP_200_OK
     )
     response['Content-Disposition'] = (
         'attachment; filename="shopping_list.txt"'

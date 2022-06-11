@@ -1,15 +1,17 @@
+from django.conf import settings
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+
 from django_filters.rest_framework import DjangoFilterBackend
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen.canvas import Canvas
+from reportlab.rl_config import TTFSearchPath
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from users.serializers import RecipeInfoSerializer
 
 from recipes.file_download import download_pdf, download_txt
 from recipes.filters import RecipeFilter
@@ -18,11 +20,14 @@ from recipes.models import (CartRecipe, FavoriteRecipe, Ingredient,
 from recipes.permissions import IsAuthorOrReadOnly
 from recipes.serializers import (IngredientSerializer, RecipeReadSerializer,
                                  RecipeSerializer, TagSerializer)
+from users.serializers import RecipeInfoSerializer
 
 IN_FAVORITE_ERROR = {'errors': 'Рецепт уже добавлен в избранные!'}
 NOT_IN_FAVORITE_ERROR = {'errors': 'Рецепта нет в избранных!'}
 IN_CART_ERROR = {'errors': 'Рецепт уже добавлен в список покупок!'}
 NOT_IN_CART_ERROR = {'errors': 'Рецепта нет в списке покупок!'}
+
+TTFSearchPath.append(str(settings.BASE_DIR) + '/reportlab')
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -71,11 +76,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_404_NOT_FOUND)
         to_buy = {
             item['ingredient__name']:
-            [item['total'], item['ingredient__measurement_unit']]
+            (item['total'], item['ingredient__measurement_unit'])
             for item in ingredients
         }
-        file_format = list(request.query_params.keys())[0]
-        if file_format == 'pdf':
+        if request.query_params.__contains__('pdf'):
             return download_pdf(to_buy, HttpResponse, pdfmetrics,
                                 TTFont, Canvas, Recipe, request)
         return download_txt(to_buy, Recipe, request, HttpResponse, status)
@@ -85,9 +89,19 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=(permissions.IsAuthenticated,),
             name='favorite')
     def favorite(self, request, pk):
+        return self.add_or_remove_instance(FavoriteRecipe, request, pk)
+
+    @action(methods=['POST', 'DELETE'],
+            detail=True,
+            permission_classes=(permissions.IsAuthenticated,),
+            name='shopping_cart')
+    def shopping_cart(self, request, pk):
+        return self.add_or_remove_instance(CartRecipe, request, pk)
+
+    def add_or_remove_instance(self, model, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
-            _, created = FavoriteRecipe.objects.get_or_create(
+            _, created = model.objects.get_or_create(
                 recipe=recipe, user=request.user
             )
             if created:
@@ -96,39 +110,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_201_CREATED
                 )
             return Response(
-                IN_FAVORITE_ERROR, status=status.HTTP_400_BAD_REQUEST
-            )
-
-        favorite_recipe = FavoriteRecipe.objects.filter(
+                IN_CART_ERROR if model is CartRecipe else IN_FAVORITE_ERROR,
+                status=status.HTTP_400_BAD_REQUEST)
+        model_object = model.objects.filter(
             recipe=recipe, user=request.user
         )
-        if favorite_recipe.exists():
-            favorite_recipe.delete()
+        if model_object.exists():
+            model_object.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(
-            NOT_IN_FAVORITE_ERROR, status=status.HTTP_400_BAD_REQUEST
+            NOT_IN_CART_ERROR if model is CartRecipe
+            else NOT_IN_FAVORITE_ERROR,
+            status=status.HTTP_400_BAD_REQUEST
         )
-
-    @action(methods=['POST', 'DELETE'],
-            detail=True,
-            permission_classes=(permissions.IsAuthenticated,),
-            name='shopping_cart')
-    def shopping_cart(self, request, pk):
-        recipe = get_object_or_404(Recipe, id=pk)
-        if request.method == 'POST':
-            _, created = CartRecipe.objects.get_or_create(
-                recipe=recipe, user=request.user
-            )
-            if created:
-                return Response(
-                    RecipeInfoSerializer(recipe).data,
-                    status=status.HTTP_201_CREATED
-                )
-            return Response(IN_CART_ERROR, status=status.HTTP_400_BAD_REQUEST)
-        cart_recipe = CartRecipe.objects.filter(
-            recipe=recipe, user=request.user
-        )
-        if cart_recipe.exists():
-            cart_recipe.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(NOT_IN_CART_ERROR, status=status.HTTP_400_BAD_REQUEST)
