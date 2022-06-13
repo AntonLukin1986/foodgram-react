@@ -65,6 +65,7 @@ jobs:
         script: |
           docker-compose stop
           docker rmi anton1986lukin/foodgram_web:v.1.0 -f
+          cd infra/
           docker-compose up -d --build
 
   send_message:
