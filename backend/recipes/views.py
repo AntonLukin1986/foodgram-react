@@ -26,7 +26,7 @@ NOT_IN_FAVORITE_ERROR = {'errors': 'Рецепта нет в избранных!
 IN_CART_ERROR = {'errors': 'Рецепт уже добавлен в список покупок!'}
 NOT_IN_CART_ERROR = {'errors': 'Рецепта нет в списке покупок!'}
 
-TTFSearchPath.append(str(settings.BASE_DIR) + '/reportlab')
+TTFSearchPath.append(str(settings.BASE_DIR) + '/data')
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -64,13 +64,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def download_shopping_cart(self, request):
         ingredients = IngredientAmount.objects.filter(
             recipes__user_carts__user=request.user
-            ).order_by(
-                'ingredient__name'
-            ).annotate(
-                total=Sum('amount')
-            ).values(
-                'ingredient__name', 'total', 'ingredient__measurement_unit'
-            )
+        ).order_by(
+            'ingredient__name'
+        ).annotate(
+            total=Sum('amount')
+        ).values(
+            'ingredient__name', 'total', 'ingredient__measurement_unit'
+        )
         if not ingredients:
             return Response(status=status.HTTP_404_NOT_FOUND)
         to_buy = {

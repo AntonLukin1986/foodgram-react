@@ -35,8 +35,8 @@ def download_txt(to_buy, Recipe, request, HttpResponse, status):
     result = '\tСписок продуктов:\n'
     for i, (name, quantity_unit) in enumerate(to_buy.items(), 1):
         result += (
-            str(i) + '. ' + name + ':  ' +
-            str(quantity_unit[0]) + ' ' + quantity_unit[1] + '\n'
+            str(i) + '. ' + name + ':  ' + str(quantity_unit[0])
+            + ' ' + quantity_unit[1] + '\n'
         )
     result += '\nдля приготовления:\n'
     for recipe in Recipe.objects.filter(
