@@ -75,6 +75,7 @@ sudo docker-compose exec backend python data/csv_to_sqlite.py
 
 [главная страница](http://51.250.24.175/api/docs/) <br>
 [админка](http://51.250.24.175/admin/)
+
 ###### (Никнейм: admin. Пароль: admin)
 
 #### Автор проекта
