@@ -25,8 +25,6 @@ class CustomUserViewSet(UserViewSet):
             User.objects.filter(following__user=request.user).
             prefetch_related('recipes')
         )
-        if not queryset:
-            return Response([], status=status.HTTP_204_NO_CONTENT)
         page = self.paginate_queryset(queryset)
         if page is not None:
             return self.get_paginated_response(
