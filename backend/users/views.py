@@ -15,16 +15,25 @@ UNSUBSCRIBE_YOURSELF_ERROR = {'errors': 'Нельзя отписаться от 
 
 
 class CustomUserViewSet(UserViewSet):
+    serializer_class = UserSubscribeSerializer
+
     @action(detail=False,
             permission_classes=(IsAuthenticated,),
             name='subscriptions')
     def subscriptions(self, request):
-        queryset = (User.objects.filter(following__user=request.user).
-                    prefetch_related('recipes'))
+        queryset = (
+            User.objects.filter(following__user=request.user).
+            prefetch_related('recipes')
+        )
+        if not queryset:
+            return Response([], status=status.HTTP_204_NO_CONTENT)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            return self.get_paginated_response(
+                self.get_serializer(page, many=True).data
+            )
         return Response(
-            UserSubscribeSerializer(
-                queryset, many=True, context={'request': request}
-            ).data,
+            self.get_serializer(queryset, many=True).data,
             status=status.HTTP_200_OK
         )
 
@@ -35,7 +44,8 @@ class CustomUserViewSet(UserViewSet):
         if user == author:
             return Response(
                 SUBSCRIBE_YOURSELF_ERROR if request.method == 'POST'
-                else UNSUBSCRIBE_YOURSELF_ERROR
+                else UNSUBSCRIBE_YOURSELF_ERROR,
+                status=status.HTTP_400_BAD_REQUEST
             )
         if request.method == 'POST':
             subscription, created = Subscribe.objects.get_or_create(
@@ -43,12 +53,13 @@ class CustomUserViewSet(UserViewSet):
             )
             if created:
                 return Response(
-                    UserSubscribeSerializer(
-                        subscription.author, context={'request': request}
-                    ).data,
-                    status=status.HTTP_201_CREATED)
-            return Response(ALREADY_SUBSCRIBED_ERROR,
-                            status=status.HTTP_400_BAD_REQUEST)
+                    self.get_serializer(subscription.author).data,
+                    status=status.HTTP_201_CREATED
+                )
+            return Response(
+                ALREADY_SUBSCRIBED_ERROR,
+                status=status.HTTP_400_BAD_REQUEST
+            )
         subscription = Subscribe.objects.filter(user=user, author=author)
         if subscription.exists():
             subscription.delete()

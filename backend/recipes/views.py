@@ -7,13 +7,13 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.rl_config import TTFSearchPath
-from rest_framework import filters, permissions, status, viewsets
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from recipes.file_download import download_pdf, download_txt
-from recipes.filters import RecipeFilter
+from recipes.filters import IngredientSearchFilter, RecipeFilter
 from recipes.models import (CartRecipe, FavoriteRecipe, Ingredient,
                             IngredientAmount, Recipe, Tag)
 from recipes.permissions import IsAuthorOrReadOnly
@@ -38,8 +38,8 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('@name',)
+    filter_backends = (IngredientSearchFilter,)
+    search_fields = ('name',)
     pagination_class = None
 
 
@@ -110,7 +110,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 )
             return Response(
                 IN_CART_ERROR if model is CartRecipe else IN_FAVORITE_ERROR,
-                status=status.HTTP_400_BAD_REQUEST)
+                status=status.HTTP_400_BAD_REQUEST
+            )
         model_object = model.objects.filter(
             recipe=recipe, user=request.user
         )
