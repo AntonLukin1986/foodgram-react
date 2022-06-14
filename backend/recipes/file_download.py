@@ -44,7 +44,7 @@ def download_txt(to_buy, Recipe, request, HttpResponse, status):
     ).order_by('name').values('name'):
         result += '~ ' + recipe['name'] + '\n'
     response = HttpResponse(
-        result, content_type='plain/txt', status=status.HTTP_200_OK
+        result, content_type='text/plain', status=status.HTTP_200_OK
     )
     response['Content-Disposition'] = (
         'attachment; filename="shopping_list.txt"'
