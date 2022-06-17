@@ -68,16 +68,11 @@ sudo docker-compose exec backend python data/csv_to_sqlite.py
 
 #### Документация к API
 
-Документация доступна локально по ссылке: `http://localhost/api/docs/` <br>
+Локально доступна по адресу: `http://localhost/api/docs/` <br>
 На работающем сайте: [документация](http://51.250.24.175/api/docs/)
 
-#### Ознакомиться с запущенным проектом можно по ссылкам
-
-[главная страница](http://51.250.24.175/api/docs/) <br>
-[админка](http://51.250.24.175/admin/)
-
-###### (Никнейм: admin. Пароль: admin)
+#### Ознакомиться с запущенным проектом можно по [ссылке](http://foodgram-hub.sytes.net/recipes)
 
 #### Автор проекта
 
-***Антон Лукин*** [AntonLukin1986](https://github.com/AntonLukin1986)
+***Антон Лукин*** [GitHub](https://github.com/AntonLukin1986)
