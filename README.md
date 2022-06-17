@@ -75,4 +75,4 @@ sudo docker-compose exec backend python data/csv_to_sqlite.py
 
 #### Автор проекта
 
-***Антон Лукин*** [GitHub](https://github.com/AntonLukin1986)
+*Антон Лукин* [GitHub](https://github.com/AntonLukin1986)
