@@ -1,6 +1,6 @@
 # FoodGram
 
-![foodgram](https://github.com/AntonLukin1986/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
+![foodgram](https://github.com/AntonLukin1986/foodgram-react/actions/workflows/foodgram_workflow.yml/badge.svg)
 
 ## Сервис для публикации кулинарных рецептов
 
@@ -21,7 +21,7 @@
 Клонировать репозиторий:
 
 ```bash
-git clone https://github.com/AntonLukin1986/foodgram-project-react
+git clone https://github.com/AntonLukin1986/foodgram-react
 ```
 
 Перейти в директорию с файлом docker-compose.yaml:
