@@ -89,7 +89,7 @@ class Recipe(models.Model):
         ],
     )
     author = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True,
+        User, on_delete=models.CASCADE, null=False,
         related_name='recipes', verbose_name='Автор'
     )
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
