@@ -9,6 +9,11 @@ DEBUG = (os.getenv('DEBUG', default=False) == 'True')
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='127.0.0.1').split()
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://foodgram-hub.sytes.net",
+    "https://www.foodgram-hub.sytes.net"
+]
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

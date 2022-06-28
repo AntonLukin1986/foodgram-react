@@ -33,18 +33,32 @@ services:
     image: nginx:1.19.3
     ports:
       - 80:80
+      - 443:443
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
       - static_value:/var/html/static/
       - media_value:/var/html/media/
-
+      - ./certbot/www:/var/www/certbot/:ro
+      - ./certbot/conf/:/etc/nginx/ssl/:ro
     restart: always
     depends_on:
       - frontend
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/www/:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw
+    depends_on:
+      - nginx
 
 volumes:
   postgres_data:
   static_value:
   media_value:
+
+# https настроен по https://dvsemenov.ru/nastrojka-https-s-pomoshhyu-nginx-lets-encrypt-i-docker/
+# для входа в админку в settings.py добавить:
+# CSRF_TRUSTED_ORIGINS = ["https://foodgram-hub.sytes.net", "https://www.foodgram-hub.sytes.net"]
