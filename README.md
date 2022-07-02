@@ -1,3 +1,5 @@
+[domen]: https://foodgram-hub.sytes.net/recipes "Переход на сайт"
+
 # FoodGram
 
 ![foodgram](https://github.com/AntonLukin1986/foodgram-react/actions/workflows/foodgram_workflow.yml/badge.svg)
@@ -71,8 +73,10 @@ sudo docker-compose exec backend python data/csv_to_sqlite.py
 Локально доступна по адресу: `http://localhost/api/docs/`  
 На работающем сайте: [документация](http://51.250.24.175/api/docs/)
 
-#### Ознакомиться с запущенным проектом можно по [ссылке](http://foodgram-hub.sytes.net/recipes)
+#### Ознакомиться с запущенным проектом можно по [ссылке][domen]
 
 #### Автор проекта
 
-*Антон Лукин* [GitHub](https://github.com/AntonLukin1986)
+*Антон Лукин*  
+[GitHub](https://github.com/AntonLukin1986)  
+<shahter86@mail.ru>
