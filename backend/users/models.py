@@ -14,9 +14,7 @@ class User(AbstractUser):
         ordering = ('username',)
 
     def __str__(self):
-        return (
-            f'{self.username} <{self.email}>'
-        )
+        return f'{self.username} <{self.email}>'
 
 
 class Subscribe(models.Model):
@@ -42,8 +40,6 @@ class Subscribe(models.Model):
                 name='unique_subscribe'
             )
         ]
-        verbose_name = 'Подписка'
-        verbose_name_plural = 'Подписки'
 
     def __str__(self):
         return f'{self.user} подписан на {self.author.username}'
